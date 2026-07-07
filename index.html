@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Well Help — Simple Health Tracker</title>
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --card: #fff;
+            --muted: #6b7280;
+            --accent-1: #fbd38d;
+            /* yellow */
+            --accent-2: #34d399;
+            /* green */
+            --accent-3: #60a5fa;
+            /* blue */
+            --accent-4: #a78bfa;
+            /* purple */
+            --glass: rgba(255, 255, 255, 0.7);
+            --shadow: 0 6px 18px rgba(20, 20, 20, 0.06);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: #0f172a
+        }
+
+        header {
+            padding: 36px 48px 12px
+        }
+
+        .brand {
+            display: flex;
+            gap: 18px;
+            align-items: center
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 24px
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-top: 6px;
+            font-size: 13px
+        }
+
+        nav {
+            padding: 12px 48px;
+            display: flex;
+            gap: 12px
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px
+        }
+
+        .btn.primary {
+            background: #5b6ef5;
+            color: #fff
+        }
+
+        .btn.ghost {
+            background: #eef2ff;
+            color: #334155
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 20px
+        }
+
+        /* top stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin: 18px 0
+        }
+
+        .stat {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .stat .left {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .stat .right {
+            font-weight: 700;
+            font-size: 18px
+        }
+
+        .pill {
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 12px
+        }
+
+        /* layout for main area */
+        .main {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 28px
+        }
+
+        /* big daily briefing card */
+        .card {
+            background: var(--card);
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: var(--shadow)
+        }
+
+        .daily {
+            display: flex;
+            gap: 20px;
+            align-items: center
+        }
+
+        .progress-wrap {
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, #fff, #fbfdff);
+            border-radius: 12px
+        }
+
+        .progress {
+            position: relative;
+            width: 110px;
+            height: 110px
+        }
+
+        .progress svg {
+            transform: rotate(-90deg)
+        }
+
+        .progress .percent {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px
+        }
+
+        .daily .desc {
+            flex: 1
+        }
+
+        .daily h3 {
+            margin: 0 0 8px
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        .small {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .link {
+            color: #4f46e5;
+            font-weight: 600;
+            text-decoration: none
+        }
+
+        /* insight column */
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 18px
+        }
+
+        .insight {
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(167, 139, 250, 0.12)
+        }
+
+        .insight.urgent {
+            border-color: #fda4af;
+            background: linear-gradient(180deg, #fff, #fff8f8)
+        }
+
+        .insight h4 {
+            margin: 0 0 8px
+        }
+
+        .tag {
+            display: inline-block;
+            background: #fff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-weight: 700
+        }
+
+        /* small stat cards under insights */
+        .mini-card {
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            border-radius: 12px
+        }
+
+        .mini-card.dark {
+            background: #0f172a;
+            color: white
+        }
+
+        .mini-card .title {
+            font-weight: 700
+        }
+
+        .mini-card p {
+            margin: 10px 0 0;
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        /* Track actions */
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 14px
+        }
+
+        .actions button {
+            cursor: pointer
+        }
+
+        /* responsive */
+        @media (max-width:900px) {
+            .main {
+                grid-template-columns: 1fr
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        /* diseases page styles */
+        .disease-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px
+        }
+
+        .disease {
+            padding: 14px;
+            border-radius: 12px;
+            background: var(--card);
+            box-shadow: var(--shadow)
+        }
+
+        @media (max-width:700px) {
+            .disease-list {
+                grid-template-columns: 1fr
+            }
+        }
+
+        footer {
+            padding: 30px 48px;
+            color: var(--muted);
+            font-size: 13px
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="brand container">
+            <div>
+                <h1>Well Help</h1>
+                <div class="subtitle">A simple wellbeing tracker.</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
+                <a class="btn ghost" href="#" onclick="showPage('home')">Home</a>
+                <a class="btn ghost" href="#" onclick="showPage('diseases')">Diseases</a>
+                <a class="btn primary" href="#" onclick="showPage('track')">Track</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- HOME -->
+        <section id="home">
+            <div class="card">
+                <h2>Welcome to Well Help</h2>
+                <p class="muted">This app helps you maintain daily healthy habits, track progress, and learn about
+                    common conditions.</p>
+                <div style="margin-top:16px;display:flex;gap:12px;align-items:center">
+                    <a class="btn primary" href="#" onclick="showPage('track')">Open Tracker</a>
+                    <a class="btn ghost" href="#" onclick="alert('Login flow placeholder')">Login</a>
+                </div>
+            </div>
+            <div style="height:18px"></div>
+            <div class="card">
+                <h3>How it works</h3>
+                <p class="small">Check in daily to keep your streak, complete missions to earn points and crystals, and
+                    read tailored insights to prioritize your wellbeing.</p>
+            </div>
+        </section>
+
+        <!-- DISEASES -->
+        <section id="diseases" style="display:none">
+            <h2 style="margin-top:6px">Diseases & Explanations</h2>
+            <div style="height:12px"></div>
+            <div class="disease-list">
+                <div class="disease">
+                    <h4>Diabetes</h4>
+                    <p class="small">A chronic condition where the body cannot produce or effectively use insulin,
+                        leading to raised blood glucose levels. Management includes diet, activity, medication, and
+                        monitoring.</p>
+                </div>
+                <div class="disease">
+                    <h4>Hypertension</h4>
+                    <p class="small">Also called high blood pressure. It increases the risk of heart disease and stroke.
+                        Lifestyle changes and medication help manage it.</p>
+                </div>
+                <div class="disease">
+                    <h4>Asthma</h4>
+                    <p class="small">A respiratory condition with episodes of airway narrowing and inflammation.
+                        Symptoms: wheeze, cough, breathlessness. Inhalers and trigger management are common treatments.
+                    </p>
+                </div>
+                <div class="disease">
+                    <h4>Anxiety</h4>
+                    <p class="small">A mental health condition characterized by excessive worry and physical symptoms
+                        like restlessness and rapid heart rate. Therapy, lifestyle changes, and sometimes medication are
+                        used.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TRACK -->
+        <section id="track" style="display:none">
+            <!-- top stat cards -->
+            <div class="stats">
+                <div class="stat">
+                    <div>
+                        <div class="left">Points (P)</div>
+                        <div class="right" id="points">--</div>
+                    </div>
+                    <div class="pill" style="background:linear-gradient(90deg,var(--accent-1),#f6e05e)">💰</div>
+                </div>
+                <div class="stat">
+                    <div>
+                        <div class="left">Crystals (C)</div>
+                        <div class="right" id="crystals">--</div>
+                    </div>
+                    <div class="pill" style="background:linear-gradient(90deg,var(--accent-2),#34d399)">🔷</div>
+                </div>
+                <div class="stat">
+                    <div>
+                        <div class="left">Streak</div>
+                        <div class="right" id="streakDays">-- Days</div>
+                    </div>
+                    <div class="pill" style="background:linear-gradient(90deg,var(--accent-3),#60a5fa)">🔥</div>
+                </div>
+                <div class="stat">
+                    <div>
+                        <div class="left">Status Tier</div>
+                        <div class="right" id="tier">--</div>
+                    </div>
+                    <div class="pill" style="background:linear-gradient(90deg,var(--accent-4),#a78bfa)">🏅</div>
+                </div>
+            </div>
+
+            <div class="main">
+                <div>
+                    <div class="card">
+                        <h3>Daily Mission Briefing</h3>
+                        <div style="height:12px"></div>
+                        <div class="daily">
+                            <div class="progress-wrap">
+                                <div class="progress" aria-hidden>
+                                    <svg width="110" height="110">
+                                        <defs>
+                                            <linearGradient id="g1" x1="0%" x2="100%">
+                                                <stop offset="0%" stop-color="#60a5fa" />
+                                                <stop offset="100%" stop-color="#34d399" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="55" cy="55" r="48" stroke="#eef2ff" stroke-width="10" fill="none">
+                                        </circle>
+                                        <circle id="progressRing" cx="55" cy="55" r="48" stroke="url(#g1)"
+                                            stroke-width="10" stroke-linecap="round" fill="none"
+                                            stroke-dasharray="301.59" stroke-dashoffset="301.59"></circle>
+                                    </svg>
+                                    <div class="percent" id="percentText">0%</div>
+                                </div>
+                            </div>
+
+                            <div class="desc">
+                                <h3>The Day's Challenge</h3>
+                                <p class="muted">Complete your daily check-in to maintain your streak and earn points
+                                    and crystals. Small consistent actions add up!</p>
+                                <div class="actions">
+                                    <button class="btn primary" id="checkInBtn">Check In Today</button>
+                                    <button class="btn ghost" id="completeMissionBtn">Mark Mission Done</button>
+                                </div>
+                                <div style="height:8px"></div>
+                                <div class="small">Today's tasks remaining: <span id="tasksRemaining">3</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height:18px"></div>
+                    <div class="card">
+                        <h3>History</h3>
+                        <p class="small">Recent activity will appear here. You can persist data locally (this demo uses
+                            localStorage).</p>
+                        <ul id="activityList" class="small" style="margin-top:10px"></ul>
+                    </div>
+                </div>
+
+                <aside class="right-col">
+                    <div class="card insight urgent">
+                        <h4>Adaptive Insight: Focus Needed</h4>
+                        <p class="small">We noticed you missed the <strong>Mindful Meditation</strong> task multiple
+                            times this week. We've temporarily increased its reward to help prioritize stress
+                            management.</p>
+                        <div style="height:8px"></div>
+                        <div style="background:#fff;padding:10px;border-radius:8px;color:#b91c1c;font-weight:700">New
+                            Reward: +40 Points, +8 Crystals</div>
+                    </div>
+
+                    <div class="mini-card card">
+                        <div class="title">Quick Summary</div>
+                        <p class="small">Streak, points, and progress are shown above. Keep checking in daily to grow
+                            your streak.</p>
+                        <div style="height:12px"></div>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <div style="flex:1">
+                                <div class="small">Current streak</div>
+                                <div id="miniStreak" style="font-weight:800;font-size:20px">--</div>
+                            </div>
+                            <div style="flex:1">
+                                <div class="small">Points</div>
+                                <div id="miniPoints" style="font-weight:800;font-size:20px">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mini-card card dark">
+                        <h4 style="margin:0">New Lore Unlocked!</h4>
+                        <p style="margin-top:10px;color:rgba(255,255,255,0.85)">Chapter 3: The Mitochondrial Engine is
+                            now available in your Profile. Your progress unlocks short science tips.</p>
+                        <div style="height:10px"></div>
+                        <button class="btn" style="background:#6b7280;color:white;border-radius:10px"
+                            onclick="alert('Read lore placeholder')">Read Lore Now</button>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Navigation
+        function showPage(id) {
+            ['home', 'diseases', 'track'].forEach(p => document.getElementById(p).style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            // focus on track to refresh stats
+            if (id === 'track') refreshStats();
+        }
+        // Initialize
+        showPage('home');
+
+        // Simple state persisted in localStorage
+        const state = {
+            points: Number(localStorage.getItem('points') || 0),
+            crystals: Number(localStorage.getItem('crystals') || 0),
+            streak: Number(localStorage.getItem('streak') || 0),
+            lastCheck: localStorage.getItem('lastCheck') || null,
+            tasksRemaining: Number(localStorage.getItem('tasksRemaining') || 3),
+            activity: JSON.parse(localStorage.getItem('activity') || '[]')
+        };
+
+        // DOM elements
+        const pointsEl = document.getElementById('points');
+        const crystalsEl = document.getElementById('crystals');
+        const streakDaysEl = document.getElementById('streakDays');
+        const tierEl = document.getElementById('tier');
+        const percentText = document.getElementById('percentText');
+        const ring = document.getElementById('progressRing');
+        const tasksRemainingEl = document.getElementById('tasksRemaining');
+        const activityList = document.getElementById('activityList');
+        const miniStreak = document.getElementById('miniStreak');
+        const miniPoints = document.getElementById('miniPoints');
+
+        // helper for date compare (UTC date)
+        function todayStr() {
+            const d = new Date();
+            return d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1) + "-" + d.getUTCDate();
+        }
+
+        function saveState() {
+            localStorage.setItem('points', state.points);
+            localStorage.setItem('crystals', state.crystals);
+            localStorage.setItem('streak', state.streak);
+            localStorage.setItem('lastCheck', state.lastCheck);
+            localStorage.setItem('tasksRemaining', state.tasksRemaining);
+            localStorage.setItem('activity', JSON.stringify(state.activity));
+        }
+
+        function refreshStats() {
+            pointsEl.innerText = state.points;
+            crystalsEl.innerText = state.crystals;
+            streakDaysEl.innerText = state.streak + ' Days';
+            miniStreak.innerText = state.streak + 'd';
+            miniPoints.innerText = state.points;
+            tierEl.innerText = (state.streak >= 14) ? 'Gold' : (state.streak >= 7) ? 'Silver' : 'Bronze';
+            tasksRemainingEl.innerText = state.tasksRemaining;
+            // progress: percent based on tasks (0-3)
+            const total = 3;
+            const done = total - state.tasksRemaining;
+            const pct = Math.round((done / total) * 100);
+            percentText.innerText = pct + '%';
+            // animate ring
+            const circumference = 2 * Math.PI * 48; // r=48
+            const offset = circumference - (pct / 100) * circumference;
+            ring.style.transition = 'stroke-dashoffset 700ms cubic-bezier(.2,.8,.2,1)';
+            ring.style.strokeDashoffset = offset;
+            // activities
+            activityList.innerHTML = '';
+            state.activity.slice().reverse().forEach(a => {
+                const li = document.createElement('li'); li.innerText = a; activityList.appendChild(li);
+            });
+        }
+
+        // click handlers
+        document.getElementById('checkInBtn').addEventListener('click', () => {
+            const today = todayStr();
+            if (state.lastCheck === today) {
+                alert('You already checked in today 🎉');
+                return;
+            }
+            // if lastCheck was yesterday -> increment streak, else reset
+            if (state.lastCheck) {
+                const last = new Date(state.lastCheck);
+                const d = new Date();
+                const diff = (new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - new Date(last.getUTCFullYear(), last.getUTCMonth(), last.getUTCDate())) / (1000 * 60 * 60 * 24);
+                if (diff === 1) { state.streak += 1; }
+                else { state.streak = 1; }
+            } else { state.streak = 1; }
+            state.lastCheck = today;
+            state.points += 10; state.crystals += 2;
+            state.activity.push(`Checked in: ${new Date().toLocaleString()}`);
+            saveState(); refreshStats();
+        });
+
+        document.getElementById('completeMissionBtn').addEventListener('click', () => {
+            if (state.tasksRemaining <= 0) { alert('All tasks completed!'); return; }
+            state.tasksRemaining -= 1; state.points += 5; state.activity.push(`Completed mission: ${new Date().toLocaleString()}`);
+            saveState(); refreshStats();
+        });
+
+        // On first load set dasharray
+        (function initRing() {
+            const circumference = 2 * Math.PI * 48;
+            ring.style.strokeDasharray = circumference;
+            ring.style.strokeDashoffset = circumference;
+            refreshStats();
+        })();
+
+        // Expose a reset for demo (not shown UI)
+        window.__resetDemo = function () {
+            localStorage.clear(); location.reload();
+        }
+    </script>
+</body>
+
+</html>
